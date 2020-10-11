@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket  = "terraform-up-and-running-example-123"
-    key     = "terraform.tfstate"
+    key     = "global/s3/terraform.tfstate"
     region  = "ap-northeast-2"
     encrypt = true
     dynamodb_table = "terraform-up-and-running-lock"
@@ -36,8 +36,4 @@ resource "aws_dynamodb_table" "terraform_lock" {
     name = "LockID"
     type = "S"
   }
-}
-
-output "s3_bucket_arn" {
-  value = aws_s3_bucket.terraform_state.arn
 }

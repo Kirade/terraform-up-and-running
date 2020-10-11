@@ -1,11 +1,16 @@
-provider "aws" {
-  region = "ap-northeast-2"
+terraform {
+  backend "s3" {
+    bucket  = "terraform-up-and-running-example-123"
+    key     = "stage/services/webserver-cluster/terraform.tfstate"
+    region  = "ap-northeast-2"
+    encrypt = true
+    dynamodb_table = "terraform-up-and-running-lock"
+  }
 }
 
 
-variable "server_port" {
-  description = "The port the server will use for HTTP requests"
-  default     = 8080
+provider "aws" {
+  region = "ap-northeast-2"
 }
 
 
