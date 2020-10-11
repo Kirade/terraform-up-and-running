@@ -8,11 +8,19 @@ terraform {
   }
 }
 
-
 provider "aws" {
   region = "ap-northeast-2"
 }
 
+data "terraform_remote_state" "db" {
+  backend = "s3"
+
+  config {
+    bucket = "terraform-up-and-running-example-123"
+    key = "stage/data-stores/mysql/terraform.tfstate"
+    region = "ap-northeast-2"
+  }
+}
 
 resource "aws_security_group" "instance" {
   name = "terraform-example-instance"
@@ -39,11 +47,7 @@ resource "aws_launch_configuration" "example" {
     aws_security_group.instance.id,
   ]
 
-  user_data = <<-EOF
-#!/bin/bash
-echo "Hello, World" > index.html
-nohup busybox httpd -f -p ${var.server_port} &
-EOF
+  user_data = file("user-dash.sh")
 
   lifecycle {
     create_before_destroy = true
