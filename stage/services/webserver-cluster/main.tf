@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket  = "terraform-up-and-running-example-123"
-    key     = "stage/services/webserver-cluster/terraform.tfstate"
-    region  = "ap-northeast-2"
-    encrypt = true
+    bucket         = "terraform-up-and-running-example-123"
+    key            = "stage/services/webserver-cluster/terraform.tfstate"
+    region         = "ap-northeast-2"
+    encrypt        = true
     dynamodb_table = "terraform-up-and-running-lock"
   }
 }
@@ -17,8 +17,18 @@ data "terraform_remote_state" "db" {
 
   config {
     bucket = "terraform-up-and-running-example-123"
-    key = "stage/data-stores/mysql/terraform.tfstate"
+    key    = "stage/data-stores/mysql/terraform.tfstate"
     region = "ap-northeast-2"
+  }
+}
+
+data "template_file" "user_data" {
+  template = file("user-dash.sh")
+
+  vars = {
+    server_port = var.server_port
+    db_address  = data.terraform_remote_state.db.address
+    db_port  = data.terraform_remote_state.db.port
   }
 }
 
@@ -127,9 +137,10 @@ resource "aws_security_group" "lb-sg" {
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [
+      "0.0.0.0/0"]
   }
 }
