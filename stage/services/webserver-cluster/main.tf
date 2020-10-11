@@ -12,6 +12,17 @@ provider "aws" {
   region = "ap-northeast-2"
 }
 
+resource "aws_security_group" "ssh" {
+   name = "allow_ssh_from_all"
+   description = "Allow SSH port from all"
+   ingress {
+     from_port = 22
+     to_port = 22
+     protocol = "tcp"
+     cidr_blocks = ["0.0.0.0/0"]
+   }
+}
+
 data "terraform_remote_state" "db" {
   backend = "s3"
 
@@ -54,6 +65,7 @@ resource "aws_launch_configuration" "example" {
   image_id        = "ami-044057cb1bc4ce527"
   instance_type   = "t2.nano"
   security_groups = [
+    aws_security_group.ssh.id,
     aws_security_group.instance.id,
   ]
 
